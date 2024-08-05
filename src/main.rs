@@ -39,6 +39,7 @@ async fn download_blob_non_compressed(data: Data<AppState>) -> impl Responder {
     match contents {
         Ok(s) =>  { 
                 HttpResponse::Ok()
+                // Disable compression reguardless of request
                 .insert_header(ContentEncoding::Identity)
                 .body(s) 
         },
@@ -46,13 +47,13 @@ async fn download_blob_non_compressed(data: Data<AppState>) -> impl Responder {
     }
 }
 
+// Request with Accept-Encoding to get a compressed response
 #[get("/download-blob")]
 async fn download_blob(data: Data<AppState>) -> impl Responder {
     let contents = fs::read_to_string(&data.test_file_path);
     match contents {
         Ok(s) =>  { 
             HttpResponse::Ok()
-                .insert_header(ContentEncoding::Identity)
                 .body(s) 
         }
         Err(e) => { HttpResponse::NotFound().body(e.to_string()) }
